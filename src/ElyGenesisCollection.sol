@@ -82,6 +82,7 @@ contract ElyGenesisCollection is ERC1155, Ownable {
 
     event PermanentURI(string uri, uint256 indexed id);
     event Purchaseable(bool state);
+    event TransactionLimit(uint256 previousLimit, uint256 newLimit);
 
     // solhint-disable-next-line no-empty-blocks
     constructor() {}
@@ -155,6 +156,12 @@ contract ElyGenesisCollection is ERC1155, Ownable {
     function withdrawEth() public onlyOwner {
         (bool success, ) = owner.call{value: address(this).balance}("");
         if (!success) revert WithdrawFail();
+    }
+
+    /// @notice Sets the maximum purchase amount per transaction.
+    function setTransactionLimit(uint256 newTransactionLimit) public onlyOwner {
+        emit TransactionLimit(transactionLimit, newTransactionLimit);
+        transactionLimit = newTransactionLimit;
     }
 
     ////////////////
