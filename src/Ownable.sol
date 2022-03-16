@@ -8,7 +8,8 @@ pragma solidity >=0.8.0;
 /// ownership so ensure you don't use `address(0)` unintentionally. The modifier
 /// to guard functions with is `onlyOwner`.
 /// @author 0xMetas
-/// @author Based on OpenZeppelin (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol)
+/// @author Based on OpenZeppelin
+/// (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol)
 abstract contract Ownable {
     /// @notice This emits when the owner changes.
     /// @param previousOwner The address of the previous owner.
