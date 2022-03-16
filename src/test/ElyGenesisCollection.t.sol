@@ -95,4 +95,32 @@ contract ElyGenesisCollectionTest is DSTest, stdCheats {
         // Verify deployer balance is increased by the expected amount
         assertEq(deployer.balance, balance + price);
     }
+
+    /// @dev Tests the `setBaseUri` function. Requirements:
+    ///   - revert when called by non-owner
+    function testSetUriNonOwner() public {
+        // Verify that updates to base URI as non-owner revert.
+        vm.expectRevert(abi.encodePacked(bytes4(keccak256("NotOwner()"))));
+        vm.prank(users[1]);
+        elyGenesisCollection.setBaseUri("test_uri");
+    }
+
+    /// @dev Test the `setBaseUri` and `uri` functions. Requirements:
+    ///   - update correctly when called by owner
+    ///   - generate correct URI based on the token ID
+    function testGetUri() public {
+        // Verify that base URI gets updated correctly as owner
+        vm.prank(deployer);
+        elyGenesisCollection.setBaseUri("ipfs://test/");
+
+        // Verify the token URI is returned in the correct format
+        startHoax(users[1]);
+
+        string memory uri;
+        uri = elyGenesisCollection.uri(0);
+        assertEq(uri, "ipfs://test/0.json");
+
+        uri = elyGenesisCollection.uri(3);
+        assertEq(uri, "ipfs://test/3.json");
+    }
 }
