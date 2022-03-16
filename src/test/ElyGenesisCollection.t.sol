@@ -17,6 +17,8 @@ contract ElyGenesisCollectionTest is DSTest, stdCheats {
 
     ElyGenesisCollection internal elyGenesisCollection;
 
+    event PermanentURI(string uri, uint256 indexed id);
+
     function setUp() public {
         utils = new Utilities();
         users = utils.createUsers(4);
@@ -122,5 +124,45 @@ contract ElyGenesisCollectionTest is DSTest, stdCheats {
 
         uri = elyGenesisCollection.uri(3);
         assertEq(uri, "ipfs://test/3.json");
+    }
+
+    /// @dev Test the `freezeMetadata` function. Requirements:
+    ///   - revert when called by non-owner
+    ///   - emit PermanentURI event for each token ID when called
+    ///   - revert if URI is modified after freeze
+    function testFreezeMetadata() public {
+        // Verify non-owner cannot freeze metadata
+        vm.prank(users[1]);
+        vm.expectRevert(abi.encodePacked(bytes4(keccak256("NotOwner()"))));
+        elyGenesisCollection.freezeMetadata();
+
+        // Switch to owner
+        startHoax(deployer);
+
+        // Set URI
+        elyGenesisCollection.setBaseUri("ipfs://test/");
+
+        string[5] memory uris = [
+            elyGenesisCollection.uri(0),
+            elyGenesisCollection.uri(1),
+            elyGenesisCollection.uri(2),
+            elyGenesisCollection.uri(3),
+            elyGenesisCollection.uri(4)
+        ];
+
+        // Set up the expected events
+        for (uint256 i = 0; i < 5; ++i) {
+            vm.expectEmit(true, false, false, true);
+            emit PermanentURI(uris[i], i);
+        }
+
+        // Freeze the metadata
+        elyGenesisCollection.freezeMetadata();
+
+        // Verify the metadata cannot be updated
+        vm.expectRevert(
+            abi.encodePacked(bytes4(keccak256("FrozenMetadata()")))
+        );
+        elyGenesisCollection.setBaseUri("ipfs://fake");
     }
 }
