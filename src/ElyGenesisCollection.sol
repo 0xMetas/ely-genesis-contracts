@@ -133,7 +133,7 @@ contract ElyGenesisCollection is ERC1155, Ownable {
     /// @dev Emits a `PermanentURI(string, uint256 indexed)` event for each token ID with the permanent URI.
     function freezeMetadata() public onlyOwner {
         metadataFrozen = true;
-        for (uint256 i = 0; i < 4; ++i) {
+        for (uint256 i = 0; i < 5; ++i) {
             emit PermanentURI(uri(i), i);
         }
     }
